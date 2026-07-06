@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXACT AI</title>
+<style>
+  :root{
+    --blue:#2E5BFF;
+    --blue-dark:#1E3FCC;
+    --gold:#F0B90B;
+    --bg:#EEF1F8;
+    --card:#FFFFFF;
+    --text:#12172B;
+    --muted:#6B7280;
+    --line:#E5E9F5;
+    --green-bg:#E9F9EF;
+    --green-text:#1D8A4C;
+    --red-bg:#FDEAEA;
+    --red-text:#C23B3B;
+    --orange-bg:#FFF3E6;
+    --orange-text:#B4620A;
+    --radius:22px;
+    --shadow:0 10px 30px -12px rgba(46,91,255,.18);
+  }
+  .dark{
+    --bg:#0B1020;
+    --card:#141B34;
+    --text:#EDF0FA;
+    --muted:#9AA4C4;
+    --line:#232B4C;
+    --green-bg:#0F2A1C;
+    --green-text:#4ADE80;
+    --red-bg:#301418;
+    --red-text:#FB7185;
+    --orange-bg:#2E220E;
+    --orange-text:#FBBF24;
+    --shadow:0 10px 30px -12px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    transition:background .25s,color .25s;
+  }
+  #app{max-width:640px;margin:0 auto;padding:20px 16px 60px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:10px;}
+  .brand{display:flex;align-items:center;gap:10px;}
+  .brand-icon{
+    width:46px;height:46px;border-radius:14px;background:var(--blue);
+    display:flex;align-items:center;justify-content:center;position:relative;
+    box-shadow:var(--shadow);
+  }
+  .brand-icon svg{width:26px;height:26px;}
+  .brand-name{font-weight:900;font-style:italic;font-size:22px;color:var(--blue);letter-spacing:.5px;}
+  .topbar-actions{display:flex;gap:8px;}
+  .pill-btn{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:8px 12px;font-weight:800;font-size:13px;color:var(--text);
+    display:flex;align-items:center;gap:6px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.04);
+  }
+  .card{
+    background:var(--card);border-radius:var(--radius);padding:26px 22px;
+    box-shadow:var(--shadow);margin-bottom:16px;
+  }
+  h1{font-size:26px;font-weight:900;text-align:center;margin:6px 0 8px;}
+  .subtitle{color:var(--muted);text-align:center;font-size:14.5px;line-height:1.5;margin-bottom:22px;}
+  label.field-label{
+    display:block;font-size:12.5px;font-weight:800;color:var(--blue);
+    letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;
+  }
+  input[type=text], select{
+    width:100%;padding:14px 16px;border-radius:14px;border:1.5px solid var(--line);
+    background:var(--bg);color:var(--text);font-size:16px;font-weight:700;margin-bottom:20px;
+    appearance:none;
+  }
+  input[type=text]:focus, select:focus{outline:2px solid var(--blue);}
+  .btn-primary{
+    width:100%;background:var(--blue);color:#fff;border:none;border-radius:16px;
+    padding:16px;font-size:16px;font-weight:900;letter-spacing:.03em;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    box-shadow:0 8px 20px -6px rgba(46,91,255,.55);
+    transition:transform .12s;
+  }
+  .btn-primary:active{transform:scale(.98);}
+  .btn-primary:disabled{opacity:.45;cursor:not-allowed;}
+  .btn-ghost{
+    background:transparent;border:none;color:var(--text);font-weight:800;
+    display:flex;align-items:center;gap:6px;cursor:pointer;margin-bottom:14px;font-size:15px;
+  }
+  .goal-option{
+    border:1.5px solid var(--line);border-radius:18px;padding:16px 18px;margin-bottom:12px;
+    display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+    background:var(--card);
+  }
+  .goal-option .go-title{font-weight:900;font-size:16px;}
+  .goal-option .go-desc{font-size:13px;color:var(--muted);margin-top:3px;}
+  .goal-option.selected{border-color:var(--blue);background:color-mix(in srgb, var(--blue) 8%, var(--card));}
+  .goal-option.selected .go-title{color:var(--blue);}
+  .radio-circle{
+    width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .goal-option.selected .radio-circle{border-color:var(--blue);}
+  .goal-option.selected .radio-circle:after{content:'';width:11px;height:11px;background:var(--blue);border-radius:50%;}
+  .topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .topic-item{
+    border:1.5px solid var(--line);border-radius:16px;padding:16px 14px;font-weight:800;
+    font-size:14.5px;cursor:pointer;background:var(--bg);text-align:left;line-height:1.3;
+    transition:.15s;
+  }
+  .topic-item:hover{border-color:var(--blue);}
+  .header-band{
+    background:var(--blue);border-radius:20px;padding:18px 20px;color:#fff;margin-bottom:18px;
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .header-band .eyebrow{font-size:11px;font-weight:800;letter-spacing:.12em;opacity:.85;}
+  .header-band .htitle{font-size:20px;font-weight:900;font-style:italic;margin-top:2px;}
+  .q-card{
+    background:var(--card);border-radius:20px;padding:18px 18px 16px;margin-bottom:14px;
+    box-shadow:var(--shadow);border:1.5px solid transparent;
+  }
+  .q-card.correct{border-color:var(--green-text);}
+  .q-card.wrong{border-color:var(--red-text);}
+  .q-head{display:flex;gap:12px;align-items:flex-start;}
+  .q-badge{
+    background:#EAF0FF;color:var(--blue);font-weight:900;font-size:13px;border-radius:10px;
+    padding:8px 10px;flex:none;
+  }
+  .dark .q-badge{background:#1c2650;}
+  .q-text{font-weight:800;font-size:15.5px;line-height:1.5;flex:1;}
+  .hint-btn{background:none;border:none;cursor:pointer;font-size:20px;flex:none;}
+  .hint-box{
+    background:var(--orange-bg);color:var(--orange-text);border-radius:12px;padding:10px 12px;
+    font-size:13px;margin:10px 0 4px;font-weight:700;
+  }
+  .choice{
+    border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:10px;
+    display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14.5px;font-weight:700;
+  }
+  .choice .letter{
+    width:26px;height:26px;border-radius:8px;background:var(--bg);color:var(--muted);
+    display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex:none;
+  }
+  .choice.selected{border-color:var(--blue);background:color-mix(in srgb, var(--blue) 6%, var(--card));}
+  .choice.selected .letter{background:var(--blue);color:#fff;}
+  .choice.show-correct{border-color:var(--green-text);background:var(--green-bg);}
+  .choice.show-correct .letter{background:var(--green-text);color:#fff;}
+  .choice.show-wrong{border-color:var(--red-text);background:var(--red-bg);}
+  .choice.show-wrong .letter{background:var(--red-text);color:#fff;}
+  .explain-box{
+    margin-top:12px;font-size:13px;line-height:1.5;padding:12px;border-radius:12px;
+    background:var(--bg);color:var(--muted);
+  }
+  .progress-wrap{background:var(--line);border-radius:99px;height:8px;margin-bottom:18px;overflow:hidden;}
+  .progress-bar{background:var(--blue);height:100%;border-radius:99px;transition:width .3s;}
+  .sticky-submit{position:sticky;bottom:12px;margin-top:6px;}
+  .result-hero{
+    background:linear-gradient(135deg,var(--blue),var(--blue-dark));border-radius:22px;
+    padding:34px 20px;text-align:center;color:#fff;margin-bottom:16px;box-shadow:var(--shadow);
+  }
+  .result-hero .trophy{font-size:40px;}
+  .result-hero .score{font-size:56px;font-weight:900;margin:4px 0;}
+  .result-hero .label{font-size:12px;letter-spacing:.14em;font-weight:800;opacity:.85;}
+  .box-title{font-weight:900;font-size:14px;margin-bottom:12px;letter-spacing:.02em;}
+  .box-green{background:var(--green-bg);border-radius:18px;padding:18px 18px;margin-bottom:14px;}
+  .box-green .box-title{color:var(--green-text);}
+  .box-orange{background:var(--orange-bg);border-radius:18px;padding:18px 18px;margin-bottom:14px;}
+  .box-orange .box-title{color:var(--orange-text);}
+  ul.result-list{margin:0;padding:0;list-style:none;}
+  ul.result-list li{display:flex;gap:10px;font-size:13.5px;font-weight:700;margin-bottom:9px;line-height:1.45;}
+  .box-strategy{
+    background:#0B1224;color:#fff;border-radius:18px;padding:18px;margin-bottom:16px;
+  }
+  .box-strategy .eyebrow{font-size:11px;color:#8FA3FF;font-weight:800;letter-spacing:.1em;margin-bottom:8px;}
+  .box-strategy p{font-style:italic;font-weight:700;font-size:14px;line-height:1.6;margin:0;text-decoration:underline;text-decoration-color:#3A4A8A;}
+  .radar-title{font-weight:900;text-align:center;margin-bottom:12px;color:var(--muted);text-decoration:underline;}
+  .bottom-actions{display:flex;gap:10px;margin-top:6px;}
+  .btn-secondary{
+    flex:1;background:var(--bg);color:var(--text);border:1.5px solid var(--line);border-radius:16px;
+    padding:14px;font-weight:900;cursor:pointer;font-size:14.5px;
+  }
+  .small-note{font-size:12px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.5;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ============ HELPERS ============ */
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function ri(min,max){return Math.floor(min+Math.random()*(max-min+1));}
+function rf(min,max,dec=1){const v=min+Math.random()*(max-min);const p=Math.pow(10,dec);return Math.round(v*p)/p;}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function buildQ(text,correctText,distractors,explain,skills,level){
+  const choices=shuffle([correctText,...distractors]);
+  const correctIndex=choices.indexOf(correctText);
+  return {text,choices,correctIndex,explain,skills,level};
+}
+const T={
+  th:{
+    welcomeTitle:"Welcome to EXACT AI",
+    welcomeSub:"กรอกชื่อและระดับชั้นการศึกษา เพื่อให้ AI ออกแบบเนื้อหาเฉพาะคุณ",
+    nickname:"ชื่อเล่นของคุณ",
+    grade:"ระดับชั้นการศึกษา",
+    gradePh:"เลือกชั้นปี...",
+    next:"ถัดไป",
+    back:"ย้อนกลับ",
+    goalTitle:"กำหนดจุดมุ่งหมาย (E)",
+    topicTitle:"เลือกบทเรียนฟิสิกส์",
+    testing:"TESTING PHASE (X)",
+    submit:"ส่งคำตอบ",
+    seeResult:"ดูผลการประเมิน",
+    retry:"ทำแบบฝึกหัดใหม่ (สุ่มใหม่)",
+    changeTopic:"เลือกบทเรียนอื่น",
+    resultTitle:"ผลการประเมิน (BILINGUAL)",
+    transferScore:"TRANSFER SCORE",
+    strong:"จุดเด่น",
+    weak:"สิ่งที่ควรพัฒนา",
+    radarTitle:"วิเคราะห์เชิงลึก (T)",
+    strategyLabel:"กลยุทธ์การเรียน FOR",
+    hint:"คำใบ้",
+    needName:"กรุณากรอกชื่อเล่นก่อนดำเนินการต่อ",
+    needGrade:"กรุณาเลือกระดับชั้นก่อนดำเนินการต่อ",
+    needGoal:"กรุณาเลือกจุดมุ่งหมายก่อนดำเนินการต่อ",
+    needAnswer:"กรุณาตอบให้ครบทุกข้อก่อนส่งคำตอบ"
+  },
+  en:{
+    welcomeTitle:"Welcome to EXACT AI",
+    welcomeSub:"Enter your name and grade so AI can tailor the content for you.",
+    nickname:"Your nickname",
+    grade:"Education level",
+    gradePh:"Select grade...",
+    next:"Next",
+    back:"Back",
+    goalTitle:"Establish your goal (E)",
+    topicTitle:"Choose a physics topic",
+    testing:"TESTING PHASE (X)",
+    submit:"Submit answers",
+    seeResult:"See results",
+    retry:"Retry (new random set)",
+    changeTopic:"Choose another topic",
+    resultTitle:"Evaluation Result (BILINGUAL)",
+    transferScore:"TRANSFER SCORE",
+    strong:"Strengths",
+    weak:"To improve",
+    radarTitle:"Deep analysis (T)",
+    strategyLabel:"Study strategy FOR",
+    hint:"Hint",
+    needName:"Please enter your nickname to continue",
+    needGrade:"Please select your grade to continue",
+    needGoal:"Please select a goal to continue",
+    needAnswer:"Please answer all questions before submitting"
+  }
+};
+const GRADES=[{id:"m4",th:"มัธยมศึกษาปีที่ 4",en:"Grade 10 (M.4)"},{id:"m5",th:"มัธยมศึกษาปีที่ 5",en:"Grade 11 (M.5)"},{id:"m6",th:"มัธยมศึกษาปีที่ 6",en:"Grade 12 (M.6)"}];
+const GOALS=[
+  {id:"basic",th_t:"ไม่เข้าใจเรื่องนี้เลย",th_d:"เน้นปูพื้นฐาน สรุปสูตร",en_t:"I don't understand this at all",en_d:"Focus on fundamentals & formula summaries",adv:0},
+  {id:"some",th_t:"พอเข้าใจพื้นฐานบ้าง",th_d:"เน้นเทคนิคการวิเคราะห์โจทย์",en_t:"I somewhat understand the basics",en_d:"Focus on problem-analysis techniques",adv:0.35},
+  {id:"fast",th_t:"ต้องการเรียนรู้อย่างรวดเร็ว",th_d:"สรุปเนื้อหารวบยอด",en_t:"I want to learn fast",en_d:"Condensed core-concept summary",adv:0.2},
+  {id:"uni",th_t:"เตรียมตัวเข้ามหาลัย",th_d:"เน้นแนะแนวคณะวิศวะ",en_t:"Preparing for university entrance",en_d:"Advanced problems, engineering-track focus",adv:0.8}
+];
+/* ============ TOPICS ============ */
+const TOPICS=[
+ {id:"intro_force",th:"บทนำและแรง",en:"Intro & Force"},
+ {id:"linear_motion",th:"การเคลื่อนที่แนวตรง",en:"Linear Motion"},
+ {id:"newton_laws",th:"กฎของนิวตัน",en:"Newton's Laws"},
+ {id:"equilibrium",th:"สมดุลกล",en:"Equilibrium"},
+ {id:"work_energy",th:"งานและพลังงาน",en:"Work & Energy"},
+ {id:"momentum",th:"โมเมนตัม",en:"Momentum"},
+ {id:"projectile",th:"การเคลื่อนที่แบบโพรเจกไทล์",en:"Projectile Motion"},
+ {id:"circular",th:"การเคลื่อนที่แบบวงกลม",en:"Circular Motion"},
+ {id:"rotation",th:"การหมุน",en:"Rotation"},
+ {id:"shm",th:"การแกว่ง (SHM)",en:"SHM"},
+ {id:"fluid",th:"ของแข็งและของไหล",en:"Solids & Fluids"},
+ {id:"heat_gas",th:"ความร้อนและแก๊ส",en:"Heat & Gas"},
+ {id:"mech_wave",th:"คลื่นกล",en:"Mechanical Waves"},
+ {id:"sound",th:"เสียง",en:"Sound"},
+ {id:"phys_optics",th:"แสงเชิงฟิสิกส์",en:"Physical Optics"},
+ {id:"geo_optics",th:"แสงเชิงเรขาคณิต",en:"Geometric Optics"},
+ {id:"electrostatics",th:"ไฟฟ้าสถิต",en:"Electrostatics"},
+ {id:"current_elec",th:"ไฟฟ้ากระแส",en:"Current Electricity"},
+ {id:"magnetism",th:"แม่เหล็กและไฟฟ้า",en:"Magnetism & Electricity"}
+];
+/* ============ QUESTION ENGINE ============ */
+const ENGINE={
+intro_force:{
+  conceptual:[
+   buildQ("แรง (Force) เป็นปริมาณชนิดใด","เวกเตอร์ (มีทั้งขนาดและทิศทาง)",["สเกลาร์ (มีแต่ขนาด)","ปริมาณที่ไม่มีหน่วย","ปริมาณที่วัดไม่ได้"],"แรงต้องระบุทั้งขนาดและทิศทางเสมอ จึงเป็นปริมาณเวกเตอร์",{phys:1,logic:1},"basic"),
+   buildQ("หน่วย SI ของแรงคือข้อใด","นิวตัน (N)",["จูล (J)","วัตต์ (W)","ปาสคาล (Pa)"],"แรงมีหน่วยเป็นนิวตัน ตาม F=ma",{phys:1},"basic"),
+   buildQ("แรงลัพธ์ (Net force) ของวัตถุที่อยู่นิ่ง มีค่าเท่าใด","ศูนย์",["เท่ากับน้ำหนักวัตถุเสมอ","มากกว่าศูนย์เสมอ","ขึ้นกับมวลวัตถุ"],"วัตถุที่อยู่นิ่งอยู่ในสภาวะสมดุล แรงลัพธ์จึงเป็นศูนย์",{phys:1,logic:1},"advanced"),
+   buildQ("การรวมแรงสองแรงที่ตั้งฉากกัน ต้องใช้หลักการใด","ทฤษฎีพีทาโกรัส/เวกเตอร์",["บวกขนาดตรงๆ","ลบขนาดกัน","คูณขนาดกัน"],"แรงเป็นเวกเตอร์ การรวมแรงที่ตั้งฉากใช้ทฤษฎีพีทาโกรัส",{phys:1,math:1},"advanced")
+  ],
+  basicGen:()=>{const F1=ri(3,10),F2=ri(3,10);return buildQ(`แรง ${F1} นิวตัน และ ${F2} นิวตัน กระทำในทิศทางเดียวกัน แรงลัพธ์มีค่ากี่นิวตัน?`,`${F1+F2} นิวตัน`,[`${Math.abs(F1-F2)} นิวตัน`,`${F1*F2} นิวตัน`,`${F1+F2+1} นิวตัน`],`แรงทิศทางเดียวกันรวมกันแบบพีชคณิต: ${F1}+${F2}=${F1+F2} นิวตัน`,{phys:1,math:1},"basic");},
+  advGen:()=>{const F1=ri(6,12),F2=ri(6,12);const R=Math.round(Math.sqrt(F1*F1+F2*F2));return buildQ(`แรง ${F1} นิวตัน และ ${F2} นิวตัน กระทำตั้งฉากกัน แรงลัพธ์มีค่าประมาณกี่นิวตัน?`,`${R} นิวตัน`,[`${F1+F2} นิวตัน`,`${R+2} นิวตัน`,`${Math.abs(F1-F2)} นิวตัน`],`ใช้พีทาโกรัส: R=√(${F1}²+${F2}²)≈${R} นิวตัน`,{phys:1,math:1},"advanced");}
+},
+linear_motion:{
+  conceptual:[
+   buildQ("ความเร่ง (Acceleration) คืออะไร","อัตราการเปลี่ยนแปลงความเร็วต่อเวลา",["ระยะทางต่อเวลา","ความเร็วเฉลี่ย","แรงต่อมวล"],"a = Δv/Δt คืออัตราการเปลี่ยนความเร็วต่อหนึ่งหน่วยเวลา",{phys:1},"basic"),
+   buildQ("วัตถุเคลื่อนที่ด้วยความเร็วคงที่ ความเร่งมีค่าเท่าใด","ศูนย์",["คงที่แต่ไม่เป็นศูนย์","เพิ่มขึ้นเรื่อยๆ","ลดลงเรื่อยๆ"],"เมื่อความเร็วไม่เปลี่ยนแปลง Δv=0 จึง a=0",{phys:1,logic:1},"basic"),
+   buildQ("กราฟ v-t เส้นตรงเอียงขึ้นแสดงถึงอะไร","ความเร่งคงที่",["ความเร็วคงที่","วัตถุหยุดนิ่ง","ความเร่งเป็นศูนย์"],"ความชันของกราฟ v-t คือความเร่ง หากเป็นเส้นตรงแสดงว่าความเร่งคงที่",{phys:1,logic:1},"advanced"),
+   buildQ("พื้นที่ใต้กราฟ v-t หมายถึงปริมาณใด","ระยะทาง/การกระจัด",["ความเร่ง","แรง","พลังงานจลน์"],"พื้นที่ใต้กราฟ v-t คือระยะทางที่เคลื่อนที่ได้",{phys:1,logic:1},"advanced")
+  ],
+  basicGen:()=>{const u=ri(0,5),a=ri(1,4),t=ri(2,6);const v=u+a*t;return buildQ(`วัตถุเริ่มต้นด้วยความเร็ว ${u} m/s เคลื่อนที่ด้วยความเร่ง ${a} m/s² เป็นเวลา ${t} วินาที ความเร็วสุดท้ายเป็นเท่าใด?`,`${v} m/s`,[`${v+2} m/s`,`${u+a} m/s`,`${a*t} m/s`],`v=u+at = ${u}+${a}×${t} = ${v} m/s`,{phys:1,math:1},"basic");},
+  advGen:()=>{const u=ri(2,6),a=ri(2,5),t=ri(2,5);const s=u*t+0.5*a*t*t;return buildQ(`วัตถุมีความเร็วต้น ${u} m/s ความเร่ง ${a} m/s² ในเวลา ${t} วินาที ระยะทางที่เคลื่อนที่ได้คือเท่าใด?`,`${s} m`,[`${s+5} m`,`${u*t} m`,`${a*t*t} m`],`s=ut+½at² = ${u}×${t} + ½×${a}×${t}² = ${s} m`,{phys:1,math:1},"advanced");}
+},
+newton_laws:{
+  conceptual:[
+   buildQ("กฎข้อที่หนึ่งของนิวตันเกี่ยวข้องกับสิ่งใด","ความเฉื่อยของวัตถุ",["ความสัมพันธ์ F=ma","แรงกิริยา-ปฏิกิริยา","พลังงานจลน์"],"กฎข้อ 1 (กฎความเฉื่อย) กล่าวว่าวัตถุจะรักษาสภาพการเคลื่อนที่เดิมถ้าไม่มีแรงลัพธ์กระทำ",{phys:1},"basic"),
+   buildQ("กฎข้อที่สามของนิวตันกล่าวถึงเรื่องใด","ทุกแรงกิริยามีแรงปฏิกิริยาขนาดเท่ากันทิศตรงข้าม",["F=ma","วัตถุที่อยู่นิ่งจะนิ่งตลอด","แรงเสียดทานเป็นศูนย์"],"กฎข้อ 3: แรงกิริยา-ปฏิกิริยาเกิดขึ้นคู่กันเสมอ ขนาดเท่ากัน ทิศตรงข้าม",{phys:1},"basic"),
+   buildQ("มวล (mass) กับน้ำหนัก (weight) ต่างกันอย่างไร","มวลคงที่ทุกที่ น้ำหนักขึ้นกับแรงโน้มถ่วง",["เหมือนกันทุกประการ","น้ำหนักคงที่ มวลเปลี่ยน","ทั้งคู่ไม่มีหน่วย"],"น้ำหนัก W=mg จึงขึ้นกับค่า g ของสถานที่ ส่วนมวลเป็นปริมาณเนื้อสารคงที่",{phys:1,logic:1},"advanced"),
+   buildQ("เมื่อคนเดินบนพื้น แรงที่ทำให้คนเคลื่อนที่ไปข้างหน้าคือแรงใด","แรงปฏิกิริยาจากพื้นตามกฎข้อ 3",["แรงโน้มถ่วง","แรงเสียดทานสถิตเท่านั้นที่ไม่เกี่ยวข้อง","แรงลอยตัว"],"เท้าดันพื้นไปข้างหลัง พื้นจึงดันเท้าไปข้างหน้าตามกฎข้อ 3 (ผ่านแรงเสียดทาน)",{phys:1,logic:1},"advanced")
+  ],
+  basicGen:()=>{const m=ri(2,10),a=ri(1,6);return buildQ(`วัตถุมวล ${m} kg ถูกแรงลัพธ์กระทำทำให้เกิดความเร่ง ${a} m/s² แรงลัพธ์มีค่ากี่นิวตัน?`,`${m*a} N`,[`${m+a} N`,`${m*a+2} N`,`${a} N`],`F=ma = ${m}×${a} = ${m*a} N`,{phys:1,math:1},"basic");},
+  advGen:()=>{const m=ri(3,8),g=10,mu=rf(0.1,0.4,2);const Ff=Math.round(mu*m*g*10)/10;return buildQ(`วัตถุมวล ${m} kg วางบนพื้นราบ สัมประสิทธิ์แรงเสียดทาน ${mu} แรงเสียดทานสูงสุดที่กระทำมีค่ากี่นิวตัน (g=10 m/s²)?`,`${Ff} N`,[`${Ff+3} N`,`${m*g} N`,`${mu*10} N`],`Ff = μmg = ${mu}×${m}×10 = ${Ff} N`,{phys:1,math:1},"advanced");}
+},
+equilibrium:{
+  conceptual:[
+   buildQ("สภาพสมดุลของวัตถุแข็งเกร็งต้องมีเงื่อนไขใด","ΣF=0 และ Στ=0",["ΣF=0 เท่านั้น","Στ=0 เท่านั้น","มวลคงที่เพียงอย่างเดียว"],"สมดุลสมบูรณ์ต้องไม่มีทั้งแรงลัพธ์และทอร์กลัพธ์",{phys:1},"basic"),
+   buildQ("โมเมนต์ของแรง (ทอร์ก) คำนวณจากอะไร","แรง × ระยะตั้งฉากจากจุดหมุน",["แรง × เวลา","มวล × ความเร่ง","แรง ÷ พื้นที่"],"τ = F×d เมื่อ d คือระยะตั้งฉากจากแนวแรงถึงจุดหมุน",{phys:1,math:1},"basic"),
+   buildQ("คานสมดุลบนจุดค้ำยัน หากแรงด้านซ้ายมากกว่าด้านขวา คานจะเป็นอย่างไร","เอียงลงด้านซ้าย",["สมดุลเสมอ","เอียงลงด้านขวา","ลอยขึ้น"],"ทอร์กด้านที่มากกว่าจะทำให้คานหมุนไปทางนั้น",{phys:1,logic:1},"advanced"),
+   buildQ("จุดศูนย์ถ่วง (center of gravity) มีความสำคัญอย่างไรต่อสมดุล","เป็นจุดที่น้ำหนักทั้งหมดถือว่ากระทำ",["ไม่มีผลต่อสมดุล","เป็นจุดที่แรงเสียดทานสูงสุด","อยู่นอกวัตถุเสมอ"],"การวิเคราะห์สมดุลมักพิจารณาน้ำหนักกระทำที่จุดศูนย์ถ่วง",{phys:1,logic:1},"advanced")
+  ],
+  basicGen:()=>{const F=ri(5,20),d=ri(1,4);return buildQ(`แรง ${F} นิวตัน กระทำห่างจากจุดหมุน ${d} เมตร ทอร์ก (โมเมนต์) มีค่ากี่ N·m?`,`${F*d} N·m`,[`${F+d} N·m`,`${F*d+3} N·m`,`${d} N·m`],`τ = F×d = ${F}×${d} = ${F*d} N·m`,{phys:1,math:1},"basic");},
+  advGen:()=>{const F1=ri(5,15),d1=ri(1,3),d2=ri(1,3);const F2=Math.round(F1*d1/d2*10)/10;return buildQ(`คานสมดุล แรง ${F1} N กระทำห่างจากจุดหมุน ${d1} m ด้านหนึ่ง อีกด้านหนึ่งห่าง ${d2} m ต้องใช้แรงเท่าใดให้สมดุล?`,`${F2} N`,[`${F1} N`,`${F2+2} N`,`${(F1*d1+d2).toFixed(1)} N`],`สมดุลทอร์ก: F1d1=F2d2 → F2=${F1}×${d1}/${d2}=${F2} N`,{phys:1,math:1},"advanced");}
+},
+work_energy:{
+  conceptual:[
+   buildQ("งาน (Work) เกิดขึ้นเมื่อใด","เมื่อแรงกระทำทำให้เกิดการกระจัดในทิศทางของแรง",["เมื่อมีแรงกระทำเท่านั้น","เมื่อวัตถุอยู่นิ่งเสมอ","เมื่อความเร็วคงที่"],"W=Fs cosθ งานเกิดขึ้นเมื่อมีการกระจัดในทิศทางของแรงกระทำ",{phys:1},"basic"),
+   buildQ("พลังงานจลน์ (KE) ขึ้นอยู่กับปริมาณใดบ้าง","มวลและความเร็ว",["มวลอย่างเดียว","ความสูงอย่างเดียว","เวลาอย่างเดียว"],"KE = ½mv² ขึ้นกับมวลและความเร็วยกกำลังสอง",{phys:1},"basic"),
+   buildQ("กฎการอนุรักษ์พลังงานกล่าวว่าอย่างไร","พลังงานรวมของระบบคงที่ ไม่สูญหายแต่เปลี่ยนรูปได้",["พลังงานลดลงเสมอ","พลังงานเพิ่มขึ้นเสมอ","พลังงานเท่ากับศูนย์เสมอ"],"พลังงานไม่ถูกสร้างหรือทำลาย เพียงเปลี่ยนรูปแบบ (เช่น PE↔KE)",{phys:1,logic:1},"advanced"),
+   buildQ("กำลัง (Power) สัมพันธ์กับงานและเวลาอย่างไร","กำลัง = งาน/เวลา",["กำลัง = งาน×เวลา","กำลัง = แรง/เวลา","กำลังไม่เกี่ยวกับงาน"],"P=W/t คืออัตราการทำงานต่อหนึ่งหน่วยเวลา",{phys:1,math:1},"advanced")
+  ],
+  basicGen:()=>{const F=ri(5,20),s=ri(2,10);return buildQ(`ออกแรง ${F} นิวตัน ลากวัตถุไปตามทิศแรงเป็นระยะ ${s} เมตร งานที่ทำมีค่ากี่จูล?`,`${F*s} J`,[`${F+s} J`,`${F*s+10} J`,`${s} J`],`W=Fs = ${F}×${s} = ${F*s} J`,{phys:1,math:1},"basic");},
+  advGen:()=>{const m=ri(1,5),v=ri(2,8);const KE=Math.round(0.5*m*v*v*10)/10;return buildQ(`วัตถุมวล ${m} kg เคลื่อนที่ด้วยความเร็ว ${v} m/s พลังงานจลน์มีค่ากี่จูล?`,`${KE} J`,[`${m*v} J`,`${KE+5} J`,`${(m*v*v).toFixed(1)} J`],`KE=½mv² = ½×${m}×${v}² = ${KE} J`,{phys:1,math:1},"advanced");}
+},
+momentum:{
+  conceptual:[
+   buildQ("โมเมนตัม (p) คำนวณจากสูตรใด","p = mv",["p = ½mv²","p = Fv","p = m/v"],"โมเมนตัมนิยามเป็น p=mv เป็นปริมาณเวกเตอร์",{phys:1},"basic"),
+   buildQ("กฎการอนุรักษ์โมเมนตัมใช้ในกรณีใด","การชนกันของวัตถุในระบบปิดที่ไม่มีแรงภายนอก",["การเคลื่อนที่แบบวงกลมเท่านั้น","เมื่อมีแรงเสียดทานมากๆ","เมื่อวัตถุอยู่นิ่งตลอดเวลา"],"หากไม่มีแรงลัพธ์ภายนอกกระทำ โมเมนตัมรวมก่อนและหลังชนเท่ากัน",{phys:1,logic:1},"basic"),
+   buildQ("การชนแบบยืดหยุ่นสมบูรณ์ (elastic) มีลักษณะอย่างไร","โมเมนตัมและพลังงานจลน์คงที่ทั้งคู่",["โมเมนตัมคงที่แต่พลังงานจลน์ไม่คงที่","พลังงานจลน์คงที่แต่โมเมนตัมไม่คงที่","ไม่มีอะไรคงที่เลย"],"การชนแบบยืดหยุ่นสมบูรณ์อนุรักษ์ทั้งโมเมนตัมและพลังงานจลน์",{phys:1,logic:1},"advanced"),
+   buildQ("แรงดล (Impulse) สัมพันธ์กับโมเมนตัมอย่างไร","แรงดล = การเปลี่ยนแปลงโมเมนตัม (FΔt=Δp)",["แรงดลไม่เกี่ยวข้องกับโมเมนตัม","แรงดล = โมเมนตัม/เวลา","แรงดล = โมเมนตัม×มวล"],"J=FΔt=Δp เป็นความสัมพันธ์ระหว่างแรงดลกับการเปลี่ยนโมเมนตัม",{phys:1,math:1},"advanced")
+  ],
+  basicGen:()=>{const m=ri(1,8),v=ri(2,10);return buildQ(`วัตถุมวล ${m} kg เคลื่อนที่ด้วยความเร็ว ${v} m/s โมเมนตัมมีค่ากี่ kg·m/s?`,`${m*v} kg·m/s`,[`${m+v} kg·m/s`,`${m*v+4} kg·m/s`,`${v} kg·m/s`],`p=mv = ${m}×${v} = ${m*v} kg·m/s`,{phys:1,math:1},"basic");},
+  advGen:()=>{const m1=ri(1,4),v1=ri(3,8),m2=ri(1,4);const vf=Math.round(m1*v1/(m1+m2)*100)/100;return buildQ(`วัตถุมวล ${m1} kg เคลื่อนที่ด้วยความเร็ว ${v1} m/s ชนติดกับวัตถุมวล ${m2} kg ที่อยู่นิ่ง (ชนแบบติดกัน) ความเร็วหลังชนมีค่ากี่ m/s?`,`${vf} m/s`,[`${v1} m/s`,`${(vf+1).toFixed(2)} m/s`,`${(m1*v1).toFixed(2)} m/s`],`อนุรักษ์โมเมนตัม: m1v1=(m1+m2)vf → vf=${m1}×${v1}/(${m1}+${m2})=${vf} m/s`,{phys:1,math:1},"advanced");}
+},
+projectile:{
+  conceptual:[
+   buildQ("การเคลื่อนที่แบบโพรเจกไทล์ประกอบด้วยการเคลื่อนที่กี่แนว","2 แนว คือแนวราบและแนวดิ่งที่เป็นอิสระต่อกัน",["1 แนวเท่านั้น","3 แนว","ไม่มีทิศทางที่แน่นอน"],"แยกวิเคราะห์แนวราบ (ความเร็วคงที่) กับแนวดิ่ง (ความเร่ง g) อย่างอิสระ",{phys:1},"basic"),
+   buildQ("ที่จุดสูงสุดของการเคลื่อนที่แบบโพรเจกไทล์ ความเร็วในแนวดิ่งเป็นเท่าใด","ศูนย์",["เท่ากับความเร็วต้น","สูงสุด","เท่ากับ g"],"ที่จุดสูงสุด vy=0 แต่ยังมีความเร็วแนวราบอยู่",{phys:1,logic:1},"basic"),
+   buildQ("มุมยิงใดที่ทำให้ระยะตกไกลที่สุด (ไม่คิดแรงต้านอากาศ)","45 องศา",["30 องศา","60 องศา","90 องศา"],"Range = v²sin(2θ)/g สูงสุดเมื่อ sin(2θ)=1 คือ θ=45°",{phys:1,math:1},"advanced"),
+   buildQ("มุมยิง 30° กับ 60° (ความเร็วต้นเท่ากัน) จะได้ระยะตกอย่างไร","ระยะตกเท่ากัน",["30° ไกลกว่าเสมอ","60° ไกลกว่าเสมอ","ระยะตกเป็นศูนย์ทั้งคู่"],"sin(2×30°)=sin(60°)=sin(2×60°)=sin(120°) มีค่าเท่ากัน ระยะจึงเท่ากัน",{phys:1,math:1,logic:1},"advanced")
+  ],
+  basicGen:()=>{const v0=ri(10,30),g=10;const t=Math.round(2*v0/g*100)/100;return buildQ(`วัตถุถูกยิงขึ้นในแนวดิ่งด้วยความเร็วต้น ${v0} m/s เวลาที่ลอยอยู่ในอากาศทั้งหมดกี่วินาที (g=10 m/s²)?`,`${t} s`,[`${(t/2).toFixed(2)} s`,`${(t+1).toFixed(2)} s`,`${v0/g} s`],`เวลารวม t=2v0/g = 2×${v0}/10 = ${t} s`,{phys:1,math:1},"basic");},
+  advGen:()=>{const v0=ri(15,25),ang=pick([30,45,60]),g=10;const rad=ang*Math.PI/180;const R=Math.round(v0*v0*Math.sin(2*rad)/g*100)/100;return buildQ(`ยิงวัตถุด้วยความเร็วต้น ${v0} m/s ทำมุม ${ang}° กับแนวราบ ระยะตกในแนวราบ (Range) มีค่ากี่เมตร (g=10 m/s²)?`,`${R} m`,[`${(R+5).toFixed(2)} m`,`${(v0*v0/g).toFixed(2)} m`,`${(R/2).toFixed(2)} m`],`R = v0²sin(2θ)/g = ${v0}²×sin(${2*ang}°)/10 ≈ ${R} m`,{phys:1,math:1},"advanced");}
+},
+circular:{
+  conceptual:[
+   buildQ("แรงสู่ศูนย์กลาง (centripetal force) มีทิศทางใด","ชี้เข้าสู่ศูนย์กลางวงกลมเสมอ",["ชี้ออกจากศูนย์กลาง","ชี้ไปตามเส้นสัมผัส","ไม่มีทิศทางแน่นอน"],"แรงสู่ศูนย์กลางต้องชี้เข้าหาจุดศูนย์กลางเพื่อทำให้วัตถุเคลื่อนที่เป็นวงกลม",{phys:1},"basic"),
+   buildQ("อัตราเร็วเชิงเส้น (v) สัมพันธ์กับคาบ (T) และรัศมี (r) อย่างไร","v = 2πr/T",["v = 2πr×T","v = r/T²","v = T/r"],"เส้นรอบวง 2πr หารด้วยเวลา 1 รอบ (T) จะได้อัตราเร็วเชิงเส้น",{phys:1,math:1},"basic"),
+   buildQ("ความเร่งสู่ศูนย์กลางคำนวณจากสูตรใด","a = v²/r",["a = vr","a = v/r²","a = r/v"],"ความเร่งสู่ศูนย์กลาง a=v²/r=ω²r",{phys:1,math:1},"advanced"),
+   buildQ("เมื่อรัศมีวงกลมเพิ่มขึ้นโดยความเร็วเชิงเส้นคงที่ แรงสู่ศูนย์กลางจะเป็นอย่างไร","ลดลง",["เพิ่มขึ้น","คงที่","เป็นศูนย์"],"F=mv²/r เมื่อ v คงที่ r เพิ่มขึ้น แรงสู่ศูนย์กลางจะลดลง",{phys:1,logic:1,math:1},"advanced")
+  ],
+  basicGen:()=>{const r=ri(1,5),T=ri(2,8);const v=Math.round(2*Math.PI*r/T*100)/100;return buildQ(`วัตถุเคลื่อนที่เป็นวงกลมรัศมี ${r} เมตร ใช้เวลา ${T} วินาทีต่อรอบ อัตราเร็วเชิงเส้นมีค่าประมาณกี่ m/s?`,`${v} m/s`,[`${(v+2).toFixed(2)} m/s`,`${(r/T).toFixed(2)} m/s`,`${(2*r/T).toFixed(2)} m/s`],`v=2πr/T = 2π×${r}/${T} ≈ ${v} m/s`,{phys:1,math:1},"basic");},
+  advGen:()=>{const m=ri(1,4),v=ri(2,8),r=ri(1,4);const F=Math.round(m*v*v/r*100)/100;return buildQ(`วัตถุมวล ${m} kg เคลื่อนที่เป็นวงกลมรัศมี ${r} m ด้วยอัตราเร็ว ${v} m/s แรงสู่ศูนย์กลางมีค่ากี่นิวตัน?`,`${F} N`,[`${(F+3).toFixed(2)} N`,`${(m*v).toFixed(2)} N`,`${(v*v/r).toFixed(2)} N`],`F=mv²/r = ${m}×${v}²/${r} ≈ ${F} N`,{phys:1,math:1},"advanced");}
+},
+rotation:{
+  conceptual:[
+   buildQ("โมเมนต์ความเฉื่อย (Moment of Inertia) ขึ้นอยู่กับปัจจัยใด","มวลและการกระจายมวลรอบแกนหมุน",["ความเร็วเชิงมุมเท่านั้น","เวลาเท่านั้น","อุณหภูมิ"],"I ขึ้นกับมวลและระยะห่างของมวลจากแกนหมุน (I=Σmr²)",{phys:1},"basic"),
+   buildQ("ทอร์กสุทธิสัมพันธ์กับความเร่งเชิงมุมอย่างไร","τ = Iα (คล้ายกับ F=ma)",["τ = I/α","τ = α/I","ไม่มีความสัมพันธ์กัน"],"เทียบเคียงกับกฎข้อ 2 ของนิวตันในรูปแบบการหมุน τ=Iα",{phys:1,math:1},"advanced"),
+   buildQ("โมเมนตัมเชิงมุม (Angular momentum) อนุรักษ์เมื่อใด","เมื่อไม่มีทอร์กลัพธ์ภายนอกกระทำ",["ตลอดเวลาไม่มีเงื่อนไข","เมื่อมีแรงเสียดทานเท่านั้น","ไม่มีการอนุรักษ์"],"L=Iω คงที่เมื่อ Στ_external=0 เช่น นักสเก็ตหุบแขนแล้วหมุนเร็วขึ้น",{phys:1,logic:1},"advanced"),
+   buildQ("พลังงานจลน์ในการหมุนคำนวณจากสูตรใด","KE_rot = ½Iω²",["KE_rot = ½mv²","KE_rot = Iω","KE_rot = mgh"],"เทียบเคียงกับพลังงานจลน์เชิงเส้น ½mv² ในรูปแบบการหมุนใช้ ½Iω²",{phys:1,math:1},"basic")
+  ],
+  basicGen:()=>{const I=ri(2,10),alpha=ri(1,5);return buildQ(`วัตถุมีโมเมนต์ความเฉื่อย ${I} kg·m² เกิดความเร่งเชิงมุม ${alpha} rad/s² ทอร์กสุทธิมีค่ากี่ N·m?`,`${I*alpha} N·m`,[`${I+alpha} N·m`,`${I*alpha+4} N·m`,`${alpha} N·m`],`τ=Iα = ${I}×${alpha} = ${I*alpha} N·m`,{phys:1,math:1},"basic");},
+  advGen:()=>{const I=ri(2,8),w=ri(2,6);const KE=Math.round(0.5*I*w*w*10)/10;return buildQ(`วัตถุมีโมเมนต์ความเฉื่อย ${I} kg·m² หมุนด้วยความเร็วเชิงมุม ${w} rad/s พลังงานจลน์ในการหมุนมีค่ากี่จูล?`,`${KE} J`,[`${(I*w).toFixed(1)} J`,`${(KE+5).toFixed(1)} J`,`${(I*w*w).toFixed(1)} J`],`KE=½Iω² = ½×${I}×${w}² = ${KE} J`,{phys:1,math:1},"advanced");}
+},
+shm:{
+  conceptual:[
+   buildQ("การเคลื่อนที่แบบ SHM คืออะไร","การแกว่งที่มีความเร่งแปรผันตรงกับการกระจัดแต่ทิศตรงข้าม",["การเคลื่อนที่ด้วยความเร็วคงที่","การเคลื่อนที่เป็นวงกลมเท่านั้น","การเคลื่อนที่ที่ไม่มีแรงกระทำ"],"a ∝ -x เป็นคุณสมบัติสำคัญของ SHM เช่น สปริงและลูกตุ้ม",{phys:1},"basic"),
+   buildQ("คาบการแกว่งของลูกตุ้มอย่างง่ายขึ้นกับปัจจัยใด","ความยาวเชือกและค่า g เท่านั้น",["มวลของลูกตุ้ม","แอมพลิจูดการแกว่ง","สีของเชือก"],"T=2π√(L/g) ไม่ขึ้นกับมวลหรือแอมพลิจูด (สำหรับมุมเล็ก)",{phys:1,logic:1},"basic"),
+   buildQ("ที่ตำแหน่งสมดุล (x=0) ของ SHM ความเร็วและความเร่งเป็นอย่างไร","ความเร็วสูงสุด ความเร่งเป็นศูนย์",["ความเร็วเป็นศูนย์ ความเร่งสูงสุด","ทั้งคู่เป็นศูนย์","ทั้งคู่สูงสุด"],"ที่จุดสมดุล แรงคืนตัว=0 (a=0) แต่พลังงานเปลี่ยนเป็นจลน์เต็มที่ (v สูงสุด)",{phys:1,logic:1},"advanced"),
+   buildQ("คาบการแกว่งของมวลติดสปริงคำนวณจากสูตรใด","T = 2π√(m/k)",["T = 2π√(k/m)","T = 2πmk","T = m/k"],"สำหรับระบบมวล-สปริง T=2π√(m/k) โดย k คือค่าคงที่สปริง",{phys:1,math:1},"advanced")
+  ],
+  basicGen:()=>{const L=rf(0.2,2,2),g=9.8;const T=Math.round(2*Math.PI*Math.sqrt(L/g)*100)/100;return buildQ(`ลูกตุ้มอย่างง่ายยาว ${L} เมตร แกว่งบนโลก (g≈9.8 m/s²) คาบการแกว่งมีค่าประมาณกี่วินาที?`,`${T} s`,[`${(T+0.5).toFixed(2)} s`,`${(L/g).toFixed(2)} s`,`${(T*2).toFixed(2)} s`],`T=2π√(L/g) = 2π√(${L}/9.8) ≈ ${T} s`,{phys:1,math:1},"basic");},
+  advGen:()=>{const m=rf(0.5,3,1),k=ri(10,50);const T=Math.round(2*Math.PI*Math.sqrt(m/k)*1000)/1000;return buildQ(`มวล ${m} kg ติดสปริงค่านิจ ${k} N/m คาบการแกว่งมีค่าประมาณกี่วินาที?`,`${T} s`,[`${(T+0.3).toFixed(3)} s`,`${(m/k).toFixed(3)} s`,`${(T*2).toFixed(3)} s`],`T=2π√(m/k) = 2π√(${m}/${k}) ≈ ${T} s`,{phys:1,math:1},"advanced");}
+},
+fluid:{
+  conceptual:[
+   buildQ("ความดัน (Pressure) นิยามจากสูตรใด","P = F/A",["P = F×A","P = m/V","P = F/V"],"ความดันคือแรงตั้งฉากต่อหนึ่งหน่วยพื้นที่ P=F/A",{phys:1},"basic"),
+   buildQ("หลักของปาสคาล (Pascal's Principle) กล่าวว่าอย่างไร","ความดันที่กระทำต่อของไหลในภาชนะปิดจะส่งผ่านไปทุกทิศทางเท่ากัน",["ความดันจะลดลงเมื่อส่งผ่านของไหล","ความดันมีทิศทางเดียว","ของไหลไม่สามารถส่งผ่านความดันได้"],"หลักการนี้เป็นพื้นฐานของเครื่องอัดไฮดรอลิก",{phys:1},"basic"),
+   buildQ("แรงลอยตัว (Buoyant force) ตามหลักอาร์คิมิดีสเท่ากับอะไร","น้ำหนักของของไหลที่ถูกแทนที่",["น้ำหนักของวัตถุทั้งหมด","ปริมาตรของวัตถุ","ความหนาแน่นของวัตถุ"],"F_buoy = ρ_fluid × g × V_displaced ตามหลักอาร์คิมิดีส",{phys:1,logic:1},"advanced"),
+   buildQ("วัตถุจะลอยน้ำได้เมื่อใด","ความหนาแน่นของวัตถุน้อยกว่าความหนาแน่นของของไหล",["น้ำหนักวัตถุเป็นศูนย์","วัตถุมีรูปทรงกลมเท่านั้น","ความหนาแน่นวัตถุมากกว่าของไหลเสมอ"],"หากความหนาแน่นวัตถุ < ของไหล แรงลอยตัวจะมากกว่าน้ำหนัก วัตถุจึงลอยได้",{phys:1,logic:1},"advanced")
+  ],
+  basicGen:()=>{const F=ri(10,100),A=rf(0.5,4,1);const P=Math.round(F/A*10)/10;return buildQ(`แรง ${F} นิวตัน กระทำตั้งฉากบนพื้นที่ ${A} ตร.เมตร ความดันมีค่ากี่ปาสคาล (Pa)?`,`${P} Pa`,[`${(P+5).toFixed(1)} Pa`,`${(F*A).toFixed(1)} Pa`,`${(A/F).toFixed(2)} Pa`],`P=F/A = ${F}/${A} = ${P} Pa`,{phys:1,math:1},"basic");},
+  advGen:()=>{const rho=1000,V=rf(0.001,0.01,3),g=10;const Fb=Math.round(rho*g*V*100)/100;return buildQ(`วัตถุปริมาตร ${V} m³ จมอยู่ในน้ำสนิท (ρ=1000 kg/m³, g=10 m/s²) แรงลอยตัวที่กระทำมีค่ากี่นิวตัน?`,`${Fb} N`,[`${(Fb+5).toFixed(2)} N`,`${(V*g).toFixed(2)} N`,`${(rho*V).toFixed(2)} N`],`F_buoy=ρgV = 1000×10×${V} = ${Fb} N`,{phys:1,math:1},"advanced");}
+},
+heat_gas:{
+  conceptual:[
+   buildQ("ความร้อน (Q) ที่ทำให้อุณหภูมิเปลี่ยนแปลงคำนวณจากสูตรใด","Q = mcΔT",["Q = mc/ΔT","Q = m/(cΔT)","Q = c×ΔT เท่านั้น"],"Q=mcΔT เมื่อ c คือความจุความร้อนจำเพาะ",{phys:1,math:1},"basic"),
+   buildQ("กฎของแก๊สอุดมคติ (Ideal Gas Law) คือสมการใด","PV = nRT",["PV = nR/T","P/V = nRT","P+V = nRT"],"PV=nRT เชื่อมโยงความดัน ปริมาตร โมล และอุณหภูมิของแก๊ส",{phys:1},"basic"),
+   buildQ("การถ่ายเทความร้อนแบบใดไม่ต้องอาศัยตัวกลาง","การแผ่รังสี (Radiation)",["การนำความร้อน (Conduction)","การพาความร้อน (Convection)","ทั้งสามแบบต้องอาศัยตัวกลาง"],"รังสีความร้อนเดินทางผ่านสุญญากาศได้ ไม่ต้องอาศัยตัวกลาง",{phys:1},"advanced"),
+   buildQ("เมื่อแก๊สในภาชนะปิดถูกทำให้อุณหภูมิสูงขึ้นโดยปริมาตรคงที่ ความดันจะเป็นอย่างไร","เพิ่มขึ้น",["ลดลง","คงที่","เป็นศูนย์"],"จาก PV=nRT เมื่อ V คงที่ P แปรผันตรงกับ T",{phys:1,logic:1},"advanced")
+  ],
+  basicGen:()=>{const m=ri(1,5),c=pick([4200,900,390]),dT=ri(5,30);const Q=m*c*dT;return buildQ(`มวล ${m} kg ความจุความร้อนจำเพาะ ${c} J/(kg·°C) ถูกทำให้อุณหภูมิเปลี่ยนไป ${dT} °C ความร้อนที่ใช้มีค่ากี่จูล?`,`${Q} J`,[`${Q+1000} J`,`${(m*c).toFixed(0)} J`,`${(c*dT).toFixed(0)} J`],`Q=mcΔT = ${m}×${c}×${dT} = ${Q} J`,{phys:1,math:1},"basic");},
+  advGen:()=>{const n=ri(1,5),T=ri(280,320),V=rf(0.01,0.05,3),R=8.31;const P=Math.round(n*R*T/V);return buildQ(`แก๊สอุดมคติ ${n} โมล อุณหภูมิ ${T} K บรรจุในปริมาตร ${V} m³ (R=8.31 J/(mol·K)) ความดันมีค่าประมาณกี่ปาสคาล?`,`${P} Pa`,[`${P+2000} Pa`,`${(n*T).toFixed(0)} Pa`,`${(T/V).toFixed(0)} Pa`],`PV=nRT → P=nRT/V = ${n}×8.31×${T}/${V} ≈ ${P} Pa`,{phys:1,math:1},"advanced");}
+},
+mech_wave:{
+  conceptual:[
+   buildQ("คลื่นกล (mechanical wave) ต้องอาศัยสิ่งใดในการเคลื่อนที่","ตัวกลาง",["สุญญากาศ","สนามแม่เหล็ก","ไม่ต้องอาศัยสิ่งใด"],"คลื่นกลต้องอาศัยตัวกลาง เช่น อากาศ น้ำ เชือก ต่างจากคลื่นแม่เหล็กไฟฟ้า",{phys:1},"basic"),
+   buildQ("ความสัมพันธ์ระหว่างความเร็วคลื่น (v) ความถี่ (f) และความยาวคลื่น (λ) คือ","v = fλ",["v = f/λ","v = f+λ","v = f-λ"],"สมการคลื่นพื้นฐาน v=fλ ใช้ได้กับคลื่นทุกชนิด",{phys:1,math:1},"basic"),
+   buildQ("คลื่นตามขวาง (transverse wave) ต่างจากคลื่นตามยาว (longitudinal wave) อย่างไร","ทิศการสั่นตั้งฉากกับทิศการเคลื่อนที่ของคลื่น",["ทิศการสั่นขนานกับทิศการเคลื่อนที่","ไม่มีการสั่นเลย","เคลื่อนที่เร็วกว่าเสมอ"],"คลื่นตามขวาง เช่น คลื่นน้ำ สั่นตั้งฉากกับทิศเคลื่อนที่ ส่วนคลื่นตามยาว เช่น เสียง สั่นขนาน",{phys:1,logic:1},"advanced"),
+   buildQ("การแทรกสอดแบบเสริม (constructive interference) เกิดขึ้นเมื่อใด","สันคลื่นตรงกับสันคลื่น (เฟสตรงกัน)",["สันคลื่นตรงกับท้องคลื่น","คลื่นทั้งสองไม่พบกัน","ความถี่ต่างกันเสมอ"],"เมื่อคลื่นสองขบวนมีเฟสตรงกัน แอมพลิจูดจะรวมกันมากขึ้น (เสริมกัน)",{phys:1,logic:1},"advanced")
+  ],
+  basicGen:()=>{const f=ri(2,20),lam=rf(0.5,5,1);const v=Math.round(f*lam*10)/10;return buildQ(`คลื่นมีความถี่ ${f} Hz ความยาวคลื่น ${lam} เมตร อัตราเร็วคลื่นมีค่ากี่ m/s?`,`${v} m/s`,[`${(v+3).toFixed(1)} m/s`,`${(f/lam).toFixed(1)} m/s`,`${(f+lam).toFixed(1)} m/s`],`v=fλ = ${f}×${lam} = ${v} m/s`,{phys:1,math:1},"basic");},
+  advGen:()=>{const v=ri(300,350),f=ri(200,800);const lam=Math.round(v/f*1000)/1000;return buildQ(`คลื่นเสียงเคลื่อนที่ด้วยอัตราเร็ว ${v} m/s ความถี่ ${f} Hz ความยาวคลื่นมีค่าประมาณกี่เมตร?`,`${lam} m`,[`${(lam+0.2).toFixed(3)} m`,`${(v*f).toFixed(0)} m`,`${(f/v).toFixed(3)} m`],`λ=v/f = ${v}/${f} ≈ ${lam} m`,{phys:1,math:1},"advanced");}
+},
+sound:{
+  conceptual:[
+   buildQ("เสียงเป็นคลื่นชนิดใด","คลื่นตามยาว (longitudinal wave)",["คลื่นตามขวาง","คลื่นแม่เหล็กไฟฟ้า","ไม่ใช่คลื่น"],"เสียงเกิดจากการอัด-ขยายของตัวกลาง จึงเป็นคลื่นตามยาว",{phys:1},"basic"),
+   buildQ("เสียงเคลื่อนที่ในตัวกลางใดได้เร็วที่สุด","ของแข็ง",["อากาศ","สุญญากาศ","แก๊ส"],"โมเลกุลของแข็งอยู่ชิดกันมาก ส่งผ่านการสั่นได้เร็วกว่าอากาศและของเหลว",{phys:1},"basic"),
+   buildQ("ปรากฏการณ์ดอปเปลอร์ (Doppler effect) เกี่ยวข้องกับอะไร","การเปลี่ยนแปลงความถี่ที่ได้ยินเมื่อแหล่งกำเนิดหรือผู้ฟังเคลื่อนที่",["การสะท้อนของเสียงเท่านั้น","การดูดกลืนเสียง","ความถี่เสียงคงที่เสมอ"],"เมื่อแหล่งกำเนิดเสียงเข้าใกล้ผู้ฟัง ความถี่ที่ได้ยินจะสูงขึ้น (และต่ำลงเมื่อห่างออก)",{phys:1,logic:1},"advanced"),
+   buildQ("ระดับความเข้มเสียง (Sound level, dB) เป็นสเกลแบบใด","ลอการิทึม",["เชิงเส้นตรง","กำลังสอง","สุ่ม"],"หน่วยเดซิเบลใช้สเกลลอการิทึมฐาน 10 เทียบกับความเข้มเสียงอ้างอิง",{phys:1,math:1},"advanced")
+  ],
+  basicGen:()=>{const v=343,f=ri(100,1000);const lam=Math.round(v/f*1000)/1000;return buildQ(`เสียงในอากาศเคลื่อนที่ด้วยอัตราเร็ว 343 m/s มีความถี่ ${f} Hz ความยาวคลื่นมีค่าประมาณกี่เมตร?`,`${lam} m`,[`${(lam+0.3).toFixed(3)} m`,`${(v*f).toFixed(0)} m`,`${(f/v).toFixed(3)} m`],`λ=v/f = 343/${f} ≈ ${lam} m`,{phys:1,math:1},"basic");},
+  advGen:()=>{const d=ri(340,1700);const t=Math.round(d/343*100)/100;return buildQ(`คนยืนห่างจากหน้าผา ${d} เมตร ตะโกนแล้วได้ยินเสียงสะท้อนกลับมาใช้เวลากี่วินาที (v เสียง=343 m/s)?`,`${t} s`,[`${(t/2).toFixed(2)} s`,`${(t*2).toFixed(2)} s`,`${(d/343/2).toFixed(2)} s`],`เสียงเดินทางไป-กลับระยะ 2d: t=2d/v=2×${d}/343 ≈ ${t} s`,{phys:1,math:1},"advanced");}
+},
+phys_optics:{
+  conceptual:[
+   buildQ("แสงเชิงฟิสิกส์ (physical optics) ศึกษาปรากฏการณ์ใดของแสง","การแทรกสอด การเลี้ยวเบน โพลาไรเซชัน",["การเดินทางเป็นเส้นตรงเท่านั้น","การสะท้อนแบบกระจกเท่านั้น","การหักเหแบบเลนส์เท่านั้น"],"แสงเชิงฟิสิกส์อธิบายพฤติกรรมคลื่นของแสง เช่น การแทรกสอดและเลี้ยวเบน",{phys:1},"basic"),
+   buildQ("การทดลองสลิตคู่ของยัง (Young's double slit) แสดงให้เห็นสมบัติใดของแสง","สมบัติความเป็นคลื่นของแสง (การแทรกสอด)",["สมบัติอนุภาคของแสง","แสงเดินทางเป็นเส้นตรงเสมอ","แสงไม่มีพลังงาน"],"แถบสว่าง-มืดที่เกิดขึ้นยืนยันว่าแสงมีสมบัติเป็นคลื่นซึ่งแทรกสอดกันได้",{phys:1,logic:1},"advanced"),
+   buildQ("เงื่อนไขการเกิดแถบสว่าง (constructive) ในสลิตคู่ของยังคือข้อใด","d sinθ = mλ (m เป็นจำนวนเต็ม)",["d sinθ = (m+½)λ","d cosθ = mλ","d = mλ เท่านั้น"],"แถบสว่างเกิดเมื่อผลต่างระยะทางเดินเท่ากับจำนวนเต็มเท่าของความยาวคลื่น",{phys:1,math:1},"advanced"),
+   buildQ("การเลี้ยวเบน (diffraction) ของแสงเกิดขึ้นเมื่อใด","เมื่อแสงผ่านช่องแคบหรือขอบวัตถุ",["เมื่อแสงเดินทางในสุญญากาศเท่านั้น","เมื่อแสงกระทบกระจกเรียบ","ไม่เกิดขึ้นกับแสงที่เป็นคลื่น"],"เมื่อขนาดช่องใกล้เคียงความยาวคลื่น แสงจะเลี้ยวเบนอ้อมขอบสิ่งกีดขวางได้",{phys:1},"basic")
+  ],
+  basicGen:()=>{const d=rf(0.1,0.5,3),lam=ri(400,700);return buildQ(`ในการทดลองสลิตคู่ ระยะห่างสลิต d=${d} mm ความยาวคลื่นแสง ${lam} nm หากมุมเลี้ยวเบนเล็กมาก การหาตำแหน่งแถบสว่างลำดับที่ 1 ใช้สมการใด?`,`d sinθ = (1)λ`,[`d sinθ = (1.5)λ`,`d cosθ = λ`,`d/sinθ = λ`],`เงื่อนไขแถบสว่างลำดับ m คือ d sinθ = mλ เมื่อ m=1`,{phys:1,math:1},"basic");},
+  advGen:()=>{const lam=ri(450,650),d=rf(0.2,0.6,2),L=ri(1,3);const x=Math.round((lam*1e-9*L)/(d*1e-3)*1000*1000)/1000;return buildQ(`สลิตคู่ระยะห่าง d=${d} mm ฉากรับอยู่ห่าง L=${L} m ความยาวคลื่นแสง ${lam} nm ระยะห่างระหว่างแถบสว่างที่ติดกันมีค่าประมาณกี่ mm?`,`${x} mm`,[`${(x+1).toFixed(3)} mm`,`${(d*L).toFixed(3)} mm`,`${(lam/d).toFixed(3)} mm`],`Δx = λL/d = (${lam}×10⁻⁹×${L})/(${d}×10⁻³) ≈ ${x} mm`,{phys:1,math:1},"advanced");}
+},
+geo_optics:{
+  conceptual:[
+   buildQ("กฎการสะท้อนของแสงกล่าวว่าอย่างไร","มุมตกกระทบเท่ากับมุมสะท้อน",["มุมตกกระทบมากกว่ามุมสะท้อนเสมอ","มุมสะท้อนเป็นศูนย์เสมอ","ไม่มีความสัมพันธ์กัน"],"θ_incidence = θ_reflection วัดจากเส้นปกติ",{phys:1},"basic"),
+   buildQ("เลนส์นูน (convex lens) รวมแสงขนานให้ไปรวมที่จุดใด","จุดโฟกัส (Focal point)",["จุดศูนย์กลางความโค้ง","จุดตัดแกนมุขสำคัญ","ไม่มีจุดรวมแสง"],"เลนส์นูนเป็นเลนส์รวมแสง แสงขนานจะถูกหักเหไปรวมกันที่โฟกัส",{phys:1},"basic"),
+   buildQ("สูตรเลนส์บาง (thin lens equation) คือข้อใด","1/f = 1/do + 1/di",["1/f = do + di","f = do×di","f = do/di"],"สูตรเลนส์บางเชื่อมโยงความยาวโฟกัส ระยะวัตถุ และระยะภาพ",{phys:1,math:1},"advanced"),
+   buildQ("กำลังขยาย (magnification) ของกระจก/เลนส์คำนวณจากอะไร","m = -di/do (อัตราส่วนระยะภาพต่อระยะวัตถุ)",["m = f/do เท่านั้น","m = do×di","m = f+do"],"กำลังขยาย m=hi/ho = -di/do บอกทั้งขนาดและลักษณะภาพ",{phys:1,math:1},"advanced")
+  ],
+  basicGen:()=>{const f=ri(5,20),d0=ri(f+2,f*3);const di=Math.round((f*d0)/(d0-f)*10)/10;return buildQ(`เลนส์นูนความยาวโฟกัส ${f} cm วางวัตถุห่างเลนส์ ${d0} cm ระยะภาพ (di) มีค่ากี่ cm?`,`${di} cm`,[`${(di+3).toFixed(1)} cm`,`${(f+d0).toFixed(1)} cm`,`${(f*d0).toFixed(1)} cm`],`1/f=1/do+1/di → 1/di=1/${f}-1/${d0} → di≈${di} cm`,{phys:1,math:1},"basic");},
+  advGen:()=>{const f=ri(8,25),d0=ri(f+3,f*2);const di=Math.round((f*d0)/(d0-f)*100)/100;const m=Math.round(-di/d0*100)/100;return buildQ(`เลนส์นูนความยาวโฟกัส ${f} cm วางวัตถุห่าง ${d0} cm กำลังขยายของภาพมีค่าประมาณเท่าใด?`,`${m}`,[`${(m+0.3).toFixed(2)}`,`${(-d0/f).toFixed(2)}`,`${(di/f).toFixed(2)}`],`หา di ก่อนจาก 1/f=1/do+1/di → di≈${di} cm จากนั้น m=-di/do ≈ ${m}`,{phys:1,math:1},"advanced");}
+},
+electrostatics:{
+  conceptual:[
+   buildQ("ประจุไฟฟ้าชนิดเดียวกันจะมีแรงกระทำต่อกันอย่างไร","ผลักกัน",["ดูดกัน","ไม่มีแรงกระทำ","แรงเป็นศูนย์เสมอ"],"ประจุชนิดเดียวกัน (เช่น บวก-บวก) จะผลักกัน ต่างชนิดจะดูดกัน",{phys:1},"basic"),
+   buildQ("กฎของคูลอมบ์ (Coulomb's Law) คำนวณแรงระหว่างประจุจากสูตรใด","F = kq1q2/r²",["F = kq1q2×r","F = k(q1+q2)/r","F = kq1q2/r"],"แรงระหว่างประจุแปรผันตรงกับผลคูณประจุ และแปรผกผันกับระยะห่างยกกำลังสอง",{phys:1,math:1},"basic"),
+   buildQ("สนามไฟฟ้า (Electric field, E) นิยามจากอะไร","แรงต่อหนึ่งหน่วยประจุทดสอบ (E=F/q)",["พลังงานต่อระยะทาง","ประจุต่อพื้นที่","แรงคูณระยะทาง"],"E=F/q บอกความเข้มของสนามไฟฟ้า ณ จุดหนึ่งๆ",{phys:1,math:1},"advanced"),
+   buildQ("ศักย์ไฟฟ้า (Electric potential) ที่ระยะไกลอนันต์จากประจุจุดมีค่าเท่าใด","ศูนย์ (กำหนดเป็นค่าอ้างอิง)",["สูงสุดเสมอ","เท่ากับประจุ","ไม่มีค่า"],"ตามธรรมเนียม กำหนดศักย์ไฟฟ้าที่ระยะอนันต์เป็นศูนย์",{phys:1,logic:1},"advanced")
+  ],
+  basicGen:()=>{const q1=ri(1,9),q2=ri(1,9),r=ri(1,4),k=9;const F=Math.round(k*q1*q2/(r*r)*10)/10;return buildQ(`ประจุ ${q1} μC และ ${q2} μC ห่างกัน ${r} เมตร (k=9×10⁹) แรงระหว่างประจุมีค่าประมาณกี่นิวตัน (คิดค่าคงที่เป็น k=9 หน่วย μC)?`,`${F} N`,[`${(F+2).toFixed(1)} N`,`${(q1*q2).toFixed(1)} N`,`${(k*q1*q2/r).toFixed(1)} N`],`F=kq1q2/r² = 9×${q1}×${q2}/${r}² ≈ ${F} N (สเกลตามหน่วยที่กำหนด)`,{phys:1,math:1},"basic");},
+  advGen:()=>{const q=ri(1,9),r=rf(0.5,3,1),k=9;const E=Math.round(k*q/(r*r)*10)/10;return buildQ(`ประจุจุด ${q} μC ที่ระยะ ${r} เมตร (k=9 หน่วยสัมพัทธ์) สนามไฟฟ้ามีค่าประมาณเท่าใด?`,`${E} (หน่วยสัมพัทธ์)`,[`${(E+1.5).toFixed(1)}`,`${(q/r).toFixed(1)}`,`${(k*q).toFixed(1)}`],`E=kq/r² = 9×${q}/${r}² ≈ ${E}`,{phys:1,math:1},"advanced");}
+},
+current_elec:{
+  conceptual:[
+   buildQ("กระแสไฟฟ้า (Electric Current) มีนิยามว่าอย่างไรในเชิงฟิสิกส์พื้นฐาน","ประจุไฟฟ้าที่ไหลผ่านพื้นที่หน้าตัดของตัวนำในหนึ่งหน่วยเวลา",["การไหลของอิเล็กตรอนจากขั้วบวกไปขั้วลบเท่านั้น","ประจุที่สะสมในแหล่งกำเนิดไฟฟ้า","ความต้านทานการเคลื่อนที่ของประจุ"],"I = Q/t คือปริมาณประจุที่ไหลผ่านต่อหนึ่งหน่วยเวลา",{phys:1},"basic"),
+   buildQ("ตามกฎของโอห์ม (Ohm's Law) หากความต้านทานของวงจรคงที่ เมื่อเพิ่มความต่างศักย์ไฟฟ้าขึ้น กระแสไฟฟ้าจะเป็นอย่างไร","เพิ่มขึ้นตามสัดส่วน",["ลดลง","คงที่ไม่เปลี่ยนแปลง","เป็นศูนย์"],"V=IR เมื่อ R คงที่ I จะแปรผันตรงกับ V",{phys:1,logic:1},"basic"),
+   buildQ("ปัจจัยใดต่อไปนี้*ไม่*ส่งผลต่อค่าความต้านทานของลวดตัวนำโลหะ","สีของฉนวนหุ้มลวด",["ความยาวของเส้นลวด","พื้นที่หน้าตัดของเส้นลวด","ชนิดของวัสดุ"],"R=ρL/A ขึ้นกับความยาว พื้นที่หน้าตัด และค่าความต้านทานจำเพาะของวัสดุ ไม่เกี่ยวกับสีฉนวน",{phys:1,logic:1},"advanced"),
+   buildQ("ในการวัดกระแสไฟฟ้าและความต่างศักย์ของตัวต้านทานในวงจร การเชื่อมต่อเครื่องวัดในข้อใดถูกต้อง","แอมมิเตอร์ต่ออนุกรม และโวลต์มิเตอร์ต่อขนาน",["แอมมิเตอร์ต่อขนาน และโวลต์มิเตอร์ต่ออนุกรม","ต่อแบบอนุกรมทั้งคู่","ต่อแบบขนานทั้งคู่"],"แอมมิเตอร์ต้องต่ออนุกรมเพื่อวัดกระแสที่ไหลผ่าน โวลต์มิเตอร์ต่อขนานเพื่อวัดความต่างศักย์คร่อมอุปกรณ์",{phys:1,logic:1},"advanced")
+  ],
+  basicGen:()=>{const V=ri(6,24),R=ri(2,12);const I=Math.round(V/R*100)/100;return buildQ(`ถ้าต่อความต่างศักย์ ${V} โวลต์ เข้ากับตัวต้านทานขนาด ${R} โอห์ม จะมีกระแสไฟฟ้าไหลผ่านกี่แอมแปร์?`,`${I} แอมแปร์`,[`${(I*2).toFixed(2)} แอมแปร์`,`${(V*R).toFixed(2)} แอมแปร์`,`${(R/V).toFixed(2)} แอมแปร์`],`I=V/R = ${V}/${R} = ${I} แอมแปร์`,{phys:1,math:1},"basic");},
+  advGen:()=>{const P=ri(20,150),V=pick([110,220]);const I=Math.round(P/V*1000)/1000;return buildQ(`หลอดไฟขนาด ${P} วัตต์ ${V} โวลต์ เมื่อใช้งานปกติจะมีกระแสไฟฟ้าไหลผ่านประมาณกี่แอมแปร์?`,`${I} แอมแปร์`,[`${(I*2).toFixed(3)} แอมแปร์`,`${(P*V/1000).toFixed(3)} แอมแปร์`,`${(V/P).toFixed(3)} แอมแปร์`],`P=VI → I=P/V = ${P}/${V} ≈ ${I} แอมแปร์`,{phys:1,math:1},"advanced");}
+},
+magnetism:{
+  conceptual:[
+   buildQ("สนามแม่เหล็กรอบเส้นลวดตัวนำที่มีกระแสไหลผ่าน มีทิศทางตามกฎใด","กฎมือขวา (Right-hand rule)",["กฎมือซ้าย","กฎของโอห์ม","กฎของนิวตัน"],"ใช้กฎมือขวา นิ้วโป้งชี้ทิศกระแส นิ้วที่เหลือวนรอบแสดงทิศสนามแม่เหล็ก",{phys:1},"basic"),
+   buildQ("แรงที่กระทำต่อเส้นลวดมีกระแสไหลในสนามแม่เหล็กคำนวณจากสูตรใด","F = BIL sinθ",["F = BI/L","F = B+IL","F = BIL²"],"แรงบนเส้นลวดในสนามแม่เหล็ก F=BILsinθ เมื่อ θ คือมุมระหว่างกระแสกับสนาม",{phys:1,math:1},"basic"),
+   buildQ("การเหนี่ยวนำแม่เหล็กไฟฟ้าตามกฎของฟาราเดย์เกิดขึ้นเมื่อใด","เมื่อฟลักซ์แม่เหล็กที่ผ่านขดลวดเปลี่ยนแปลง",["เมื่อกระแสไฟฟ้าคงที่เสมอ","เมื่อไม่มีสนามแม่เหล็กเลย","เมื่ออุณหภูมิเปลี่ยนแปลง"],"EMF เหนี่ยวนำเกิดจากอัตราการเปลี่ยนแปลงฟลักซ์แม่เหล็ก (Faraday's law)",{phys:1,logic:1},"advanced"),
+   buildQ("มอเตอร์ไฟฟ้าทำงานโดยอาศัยหลักการใด","แรงที่กระทำต่อลวดมีกระแสในสนามแม่เหล็ก (แปลงพลังงานไฟฟ้าเป็นกล)",["การเหนี่ยวนำแม่เหล็กไฟฟ้าเพียงอย่างเดียว","แรงโน้มถ่วง","แรงเสียดทาน"],"มอเตอร์อาศัยแรง F=BIL ที่กระทำต่อขดลวดในสนามแม่เหล็กทำให้เกิดการหมุน",{phys:1,logic:1},"advanced")
+  ],
+  basicGen:()=>{const B=rf(0.1,2,2),I=ri(1,10),L=rf(0.2,2,1);const F=Math.round(B*I*L*100)/100;return buildQ(`เส้นลวดยาว ${L} เมตร มีกระแสไฟฟ้า ${I} แอมแปร์ ไหลผ่านตั้งฉากกับสนามแม่เหล็ก ${B} เทสลา แรงที่กระทำมีค่ากี่นิวตัน?`,`${F} N`,[`${(F+1).toFixed(2)} N`,`${(B+I+L).toFixed(2)} N`,`${(I*L).toFixed(2)} N`],`F=BIL = ${B}×${I}×${L} = ${F} N`,{phys:1,math:1},"basic");},
+  advGen:()=>{const N=ri(50,300),dPhi=rf(0.001,0.02,3),dt=rf(0.01,0.2,2);const emf=Math.round(N*dPhi/dt*100)/100;return buildQ(`ขดลวด ${N} รอบ ฟลักซ์แม่เหล็กเปลี่ยนแปลง ${dPhi} Wb ในเวลา ${dt} วินาที แรงเคลื่อนไฟฟ้าเหนี่ยวนำ (EMF) มีค่าประมาณกี่โวลต์?`,`${emf} V`,[`${(emf+3).toFixed(2)} V`,`${(N*dPhi).toFixed(2)} V`,`${(dPhi/dt).toFixed(2)} V`],`EMF = N×Δφ/Δt = ${N}×${dPhi}/${dt} ≈ ${emf} V`,{phys:1,math:1},"advanced");}
+}
+};
+const GOAL_MIX={basic:0,some:0.35,fast:0.2,uni:0.8};
+function assembleQuiz(topicId,goalId){
+  const eng=ENGINE[topicId];
+  const advRatio=GOAL_MIX[goalId]!==undefined?GOAL_MIX[goalId]:0.3;
+  const total=10;
+  const advCount=Math.round(total*advRatio);
+  const basicCount=total-advCount;
+  let cBasic=shuffle(eng.conceptual.filter(c=>c.level==="basic"));
+  let cAdv=shuffle(eng.conceptual.filter(c=>c.level==="advanced"));
+  let out=[];
+  for(let i=0;i<basicCount;i++){
+    if(i%2===0 && cBasic.length) out.push(cBasic.pop());
+    else out.push(eng.basicGen());
+  }
+  for(let i=0;i<advCount;i++){
+    if(i%2===0 && cAdv.length) out.push(cAdv.pop());
+    else out.push(eng.advGen());
+  }
+  return shuffle(out).slice(0,10);
+}
+/* ============ STATE ============ */
+const state={screen:"welcome",lang:"th",dark:false,name:"",grade:"",goal:null,topic:null,questions:[],answers:[],submitted:false,error:""};
+function tr(key){return T[state.lang][key];}
+function topicLabel(t){return state.lang==="th"?t.th:t.en;}
+function goalTitle(g){return state.lang==="th"?g.th_t:g.en_t;}
+function goalDesc(g){return state.lang==="th"?g.th_d:g.en_d;}
+function gradeLabel(g){return state.lang==="th"?g.th:g.en;}
+/* ============ RENDER ============ */
+function iconSvg(){return `<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="14" height="2.4" rx="1.2" fill="white"/><rect x="3" y="11" width="14" height="2.4" rx="1.2" fill="white"/><rect x="3" y="16" width="10" height="2.4" rx="1.2" fill="white"/><circle cx="19" cy="12" r="3.4" fill="#F0B90B"/></svg>`;}
+function topBar(showBack,onBack){
+  return `<div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      ${showBack?`<button class="btn-ghost" onclick="${onBack}" style="margin:0;padding:6px;">‹</button>`:""}
+      <div class="brand"><div class="brand-icon">${iconSvg()}</div><div class="brand-name">EXACT AI</div></div>
+    </div>
+    <div class="topbar-actions">
+      <button class="pill-btn" onclick="toggleLang()">🌐 ${state.lang.toUpperCase()}</button>
+      <button class="pill-btn" onclick="toggleDark()">${state.dark?"☀️":"🌙"}</button>
+    </div>
+  </div>`;
+}
+function renderWelcome(){
+  return `${topBar(false)}
+  <div class="card">
+    <h1>${tr("welcomeTitle")}</h1>
+    <p class="subtitle">${tr("welcomeSub")}</p>
+    <label class="field-label">${tr("nickname")}</label>
+    <input type="text" id="nameInput" value="${state.name}" placeholder="เช่น มาวิน...">
+    <label class="field-label">${tr("grade")}</label>
+    <select id="gradeInput">
+      <option value="">${tr("gradePh")}</option>
+      ${GRADES.map(g=>`<option value="${g.id}" ${state.grade===g.id?"selected":""}>${gradeLabel(g)}</option>`).join("")}
+    </select>
+    ${state.error?`<div style="color:var(--red-text);font-size:13px;font-weight:700;margin:-10px 0 14px;">${state.error}</div>`:""}
+    <button class="btn-primary" onclick="goWelcomeNext()">${tr("next")} ›</button>
+  </div>`;
+}
+function renderGoal(){
+  return `${topBar(true,"state.screen='welcome';render();")}
+  <div class="card">
+    <div style="font-weight:900;font-size:20px;margin-bottom:18px;">${tr("goalTitle")}</div>
+    ${GOALS.map(g=>`
+      <div class="goal-option ${state.goal===g.id?"selected":""}" onclick="selectGoal('${g.id}')">
+        <div><div class="go-title">${goalTitle(g)}</div><div class="go-desc">${goalDesc(g)}</div></div>
+        <div class="radio-circle"></div>
+      </div>`).join("")}
+    ${state.error?`<div style="color:var(--red-text);font-size:13px;font-weight:700;margin:6px 0;">${state.error}</div>`:""}
+    <button class="btn-primary" style="margin-top:8px;" onclick="goGoalNext()">${tr("next")} ›</button>
+  </div>`;
+}
+function renderTopicPick(){
+  return `${topBar(true,"state.screen='goal';render();")}
+  <div class="card">
+    <div style="font-weight:900;font-size:20px;margin-bottom:18px;">${tr("topicTitle")}</div>
+    <div class="topic-grid">
+      ${TOPICS.map(t=>`<button class="topic-item" onclick="selectTopic('${t.id}')">${topicLabel(t)}</button>`).join("")}
+    </div>
+  </div>`;
+}
+function renderQuiz(){
+  const answeredCount=state.answers.filter(a=>a!==undefined&&a!==null).length;
+  const topicObj=TOPICS.find(t=>t.id===state.topic);
+  return `${topBar(true,"backToTopics()")}
+  <div class="header-band">
+    <div><div class="eyebrow">${tr("testing")}</div><div class="htitle">${topicLabel(topicObj)}</div></div>
+    <div style="font-size:26px;">🖼️</div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" style="width:${(answeredCount/10*100)}%;"></div></div>
+  ${state.questions.map((q,i)=>renderQCard(q,i)).join("")}
+  ${state.error?`<div style="color:var(--red-text);font-size:13px;font-weight:700;text-align:center;margin-bottom:10px;">${state.error}</div>`:""}
+  <div class="sticky-submit">
+    ${!state.submitted?
+      `<button class="btn-primary" onclick="submitQuiz()">${tr("submit")}</button>`:
+      `<button class="btn-primary" onclick="goToResult()">${tr("seeResult")} ›</button>`}
+  </div>`;
+}
+function renderQCard(q,i){
+  const userAns=state.answers[i];
+  const showFeedback=state.submitted;
+  let cardClass="q-card";
+  if(showFeedback) cardClass+= userAns===q.correctIndex?" correct":" wrong";
+  return `<div class="${cardClass}">
+    <div class="q-head">
+      <div class="q-badge">Q${i+1}</div>
+      <div class="q-text">${q.text}</div>
+      <button class="hint-btn" onclick="toggleHint(${i})">💡</button>
+    </div>
+    ${state._hints&&state._hints[i]?`<div class="hint-box">${tr("hint")}: ${q.explain}</div>`:""}
+    ${q.choices.map((c,ci)=>{
+      let cls="choice";
+      if(!showFeedback){ if(userAns===ci) cls+=" selected"; }
+      else{
+        if(ci===q.correctIndex) cls+=" show-correct";
+        else if(ci===userAns) cls+=" show-wrong";
+      }
+      return `<div class="${cls}" onclick="${showFeedback?"":`selectAnswer(${i},${ci})`}">
+        <div class="letter">${String.fromCharCode(65+ci)}</div><div>${c}</div>
+      </div>`;
+    }).join("")}
+    ${showFeedback?`<div class="explain-box">${q.explain}</div>`:""}
+  </div>`;
+}
+function skillPercent(skillKey){
+  let asked=0,correct=0;
+  state.questions.forEach((q,i)=>{
+    if(q.skills&&q.skills[skillKey]){
+      asked++;
+      if(state.answers[i]===q.correctIndex) correct++;
+    }
+  });
+  if(asked===0) return 50;
+  return Math.round(correct/asked*100);
+}
+function renderResult(){
+  const score=state.questions.reduce((acc,q,i)=>acc+(state.answers[i]===q.correctIndex?1:0),0);
+  const correctList=[],wrongList=[];
+  state.questions.forEach((q,i)=>{
+    const short=q.text.length>60?q.text.slice(0,60)+"...":q.text;
+    if(state.answers[i]===q.correctIndex) correctList.push(short);
+    else wrongList.push(short);
+  });
+  const physP=skillPercent("phys"),mathP=skillPercent("math"),logicP=skillPercent("logic"),accP=Math.round(score/10*100);
+  const topicObj=TOPICS.find(t=>t.id===state.topic);
+  const strategy = score>=8 ?
+    (state.lang==="th"?`ยินดีด้วย! คุณทำคะแนนได้ดีมากในหัวข้อ ${topicLabel(topicObj)} แสดงว่าคุณมีพื้นฐานที่แน่นมาก พร้อมสำหรับการเรียนรู้ในระดับที่ซับซ้อนขึ้น`:`Great job! You scored well on ${topicLabel(topicObj)}. Your fundamentals are solid — ready for more advanced material.`) :
+    score>=5 ?
+    (state.lang==="th"?`คุณมีความเข้าใจพื้นฐานเรื่อง ${topicLabel(topicObj)} ในระดับหนึ่งแล้ว ลองทบทวนโจทย์ที่ผิดอีกครั้งเพื่อความแม่นยำที่มากขึ้น`:`You have a fair grasp of ${topicLabel(topicObj)}. Review the missed questions to sharpen accuracy.`) :
+    (state.lang==="th"?`เรื่อง ${topicLabel(topicObj)} ยังต้องฝึกฝนเพิ่มเติม แนะนำให้กลับไปทบทวนสูตรและแนวคิดพื้นฐานก่อนลองทำแบบฝึกหัดใหม่`:`You need more practice on ${topicLabel(topicObj)}. Review core formulas before trying again.`);
+  return `${topBar(true,"backToTopics()")}
+  <div class="result-hero">
+    <div class="trophy">🏆</div>
+    <div class="score">${score}</div>
+    <div class="label">${tr("transferScore")} / 10</div>
+  </div>
+  <div class="box-green">
+    <div class="box-title">✅ ${tr("strong")}</div>
+    <ul class="result-list">${correctList.length?correctList.map(c=>`<li>✔️ ${c}</li>`).join(""):`<li>${state.lang==="th"?"ยังไม่มีข้อที่ตอบถูก ลองทบทวนแล้วทำใหม่":"No correct answers yet — review and try again"}</li>`}</ul>
+  </div>
+  <div class="box-orange">
+    <div class="box-title">⚠️ ${tr("weak")}</div>
+    <ul class="result-list">${wrongList.length?wrongList.map(c=>`<li>❗ ${c}</li>`).join(""):`<li>${state.lang==="th"?"ยอดเยี่ยม! ไม่มีข้อผิดเลย":"Excellent! No mistakes"}</li>`}</ul>
+  </div>
+  <div class="box-strategy">
+    <div class="eyebrow">✨ ${tr("strategyLabel")} ${state.name||"-"}</div>
+    <p>"${strategy}"</p>
+  </div>
+  <div class="card">
+    <div class="radar-title">${tr("radarTitle")}</div>
+    ${radarSvg(physP,mathP,logicP,accP)}
+  </div>
+  <div class="bottom-actions">
+    <button class="btn-secondary" onclick="retryQuiz()">🔄 ${tr("retry")}</button>
+    <button class="btn-secondary" onclick="backToTopics()">📚 ${tr("changeTopic")}</button>
+  </div>`;
+}
+function radarSvg(phys,math,logic,acc){
+  const labels=state.lang==="th"?["ฟิสิกส์","คณิตศาสตร์","ตรรกะ","ความแม่นยำ"]:["Physics","Math","Logic","Accuracy"];
+  const vals=[phys,math,logic,acc];
+  const cx=150,cy=150,R=100;
+  const angleFor=i=>-Math.PI/2 + i*(Math.PI*2/4);
+  function pt(i,scale){const a=angleFor(i);const r=R*scale;return [cx+r*Math.cos(a),cy+r*Math.sin(a)];}
+  const gridLevels=[0.25,0.5,0.75,1];
+  const gridPolys=gridLevels.map(lv=>{
+    const p=[0,1,2,3].map(i=>pt(i,lv).join(",")).join(" ");
+    return `<polygon points="${p}" fill="none" stroke="var(--line)" stroke-width="1"/>`;
+  }).join("");
+  const axisLines=[0,1,2,3].map(i=>{const [x,y]=pt(i,1);return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="var(--line)" stroke-width="1"/>`;}).join("");
+  const dataPts=[0,1,2,3].map(i=>pt(i,vals[i]/100).join(",")).join(" ");
+  const labelEls=[0,1,2,3].map(i=>{const [x,y]=pt(i,1.22);return `<text x="${x}" y="${y}" font-size="12" font-weight="700" fill="var(--muted)" text-anchor="middle">${labels[i]}</text>`;}).join("");
+  return `<svg viewBox="0 0 300 300" width="100%" style="max-width:320px;display:block;margin:0 auto;">
+    ${gridPolys}${axisLines}
+    <polygon points="${dataPts}" fill="var(--blue)" fill-opacity="0.35" stroke="var(--blue)" stroke-width="2.5"/>
+    ${labelEls}
+  </svg>`;
+}
+function render(){
+  const app=document.getElementById("app");
+  document.body.classList.toggle("dark",state.dark);
+  let html="";
+  if(state.screen==="welcome") html=renderWelcome();
+  else if(state.screen==="goal") html=renderGoal();
+  else if(state.screen==="topic") html=renderTopicPick();
+  else if(state.screen==="quiz") html=renderQuiz();
+  else if(state.screen==="result") html=renderResult();
+  app.innerHTML=html;
+}
+/* ============ ACTIONS ============ */
+function toggleLang(){state.lang=state.lang==="th"?"en":"th";render();}
+function toggleDark(){state.dark=!state.dark;render();}
+function goWelcomeNext(){
+  const name=document.getElementById("nameInput").value.trim();
+  const grade=document.getElementById("gradeInput").value;
+  if(!name){state.error=tr("needName");render();return;}
+  if(!grade){state.error=tr("needGrade");render();return;}
+  state.name=name;state.grade=grade;state.error="";state.screen="goal";render();
+}
+function selectGoal(id){state.goal=id;state.error="";render();}
+function goGoalNext(){
+  if(!state.goal){state.error=tr("needGoal");render();return;}
+  state.error="";state.screen="topic";render();
+}
+function selectTopic(id){
+  state.topic=id;
+  state.questions=assembleQuiz(id,state.goal);
+  state.answers=new Array(state.questions.length).fill(null);
+  state.submitted=false;
+  state._hints={};
+  state.error="";
+  state.screen="quiz";
+  render();
+}
+function toggleHint(i){state._hints=state._hints||{};state._hints[i]=!state._hints[i];render();}
+function selectAnswer(qi,ci){if(state.submitted)return;state.answers[qi]=ci;state.error="";render();}
+function submitQuiz(){
+  if(state.answers.some(a=>a===null||a===undefined)){state.error=tr("needAnswer");render();return;}
+  state.submitted=true;state.error="";render();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function goToResult(){state.screen="result";render();window.scrollTo({top:0,behavior:"smooth"});}
+function retryQuiz(){
+  state.questions=assembleQuiz(state.topic,state.goal);
+  state.answers=new Array(state.questions.length).fill(null);
+  state.submitted=false;state._hints={};state.error="";
+  state.screen="quiz";render();window.scrollTo({top:0,behavior:"smooth"});
+}
+function backToTopics(){state.screen="topic";render();window.scrollTo({top:0,behavior:"smooth"});}
+render();
+</script>
+</body>
+</html>
